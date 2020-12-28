@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="create.css">
+<link rel="stylesheet" href="index.css">
+<script src="index.js"></script>
+<script src="https://kit.fontawesome.com/aeca58ef70.js" crossorigin="anonymous"></script>
+
+<style>
+  
+</style>
+<body>
+
+<script>
+var app = angular.module("myShoppingList", []); 
+app.controller("myCtrl", function($scope , $http) {
+	$scope.showDetails=1;
+	$scope.showStudentCourseDetails=0;
+	$scope.create=1;
+	$scope.createORedit="Enter Details";
+	
+   
+    $http({
+    method : "GET",
+   
+      url : "https://localhost:44371/api/getallstudent"
+  }).then(function mySuccess(response) {
+    $scope.myWelcome = response.data;
+  }, function myError(response) {
+    $scope.myWelcome = response.statusText;
+  });
+
+  $scope.deleteConfirm=function(x_id,idx){
+		  
+      
+		  $http({
+		method : "DELETE",
+	   
+		  url : "https://localhost:44371/api/deletestudent/"+x_id
+	  }).then(function mySuccess(response) {
+		$scope.deleteSuccess = response.data;
+		
+	
+		  
+		
+	  }, function myError(response) {
+		$scope.deleteSuccess = response.statusText;
+	  });
+	
+	  $scope.myWelcome.splice(idx,1);
+	
+		}
+		
+
+  $scope.addStudent= function ()
+  {
+    $scope.save=$scope.myWelcome;
+	$scope.showForm=1;
+	$scope.showModal=0;
+	$scope.showDetails=0;
+	$scope.create=1; 
+	  $scope.studentEmail=
+	  $scope.studentName=$scope.studentPhone="";
+  }
+  $scope.editStudentSuccess=function()
+  {
+	  $scope.create=1;
+	if($scope.studentForm.$valid)
+	  {
+		  $scope.status="Update Successful !"
+		  $scope.actionText="OK"
+		$scope.showForm=0;
+		$scope.showModal=1;
+		$scope.create=1;
+		$http({
+    method : "PUT",
+   
+      url : "https://localhost:44371/api/updatestudent",
+	  data : {
+		  "ID":$scope.studentID,
+		  "Name" : $scope.studentName,
+		  "Email" : $scope.studentEmail,
+		  "Phone" : $scope.studentPhone
+
+	  }
+  }).then(function mySuccess(response) {
+    $scope.createSuccess = response.data;
+	console.log($http);
+	$http({
+    method : "GET",
+   
+      url : "https://localhost:44371/api/getallstudent"
+  }).then(function mySuccess(response) {
+    $scope.myWelcome = response.data;
+	$scope.studentName=$scope.studentPhone=$scope.studentEmail=null;
+  }, function myError(response) {
+    $scope.myWelcome = response.statusText;
+	
+  });
+    
+
+      
+    
+  }, function myError(response) {
+    $scope.createSuccess = response.statusText;
+	console.log($http);
+  });
+
+	  }
+
+	  else{
+		$scope.status="Fill out the form properly"
+		$scope.showModal=1;
+		$scope.showForm=0;
+		$scope.actionText="Go To Form"
+	  }
+
+
+
+  }
+  $scope.editStudent= function(x,idx){
+	  console.log(x);
+	  
+	  $scope.actionText="Update";
+	  $scope.showDetails=0;
+	  $scope.create=0;
+	  $scope.studentID=x.ID; 
+	  $scope.studentEmail=x.Email;
+	  $scope.studentName=x.Name;
+	  $scope.studentPhone=x.Phone;
+	  $scope.showForm=1;
+	  
+	 
+  }
+
+  $scope.home=function()
+  {
+	  $scope.showForm=0;
+	  $scope.showModal=0;
+	  $scope.showDetails=1;
+	  $scope.create=1;
+  }
+
+
+  $scope.showStudent= function()
+  {
+	  if ($scope.actionText=="OK")
+	  {
+	  $scope.showDetails=1;
+	  $scope.showModal=0;
+	  }
+	  else if ($scope.actionText=='Go To Form') 
+	  {
+		  $scope.showModal=0;
+		  $scope.showForm=1;
+	  }
+	  else if ($scope.action=='delete')
+	  {
+		  $scope.showModal=0;
+		  console.log("dhuksi");
+		  console.log($scope.x_id);	
+		  $scope.deleteConfirm($scope.x_id,$scope.idx);
+		 
+
+	  }
+	
+  }
+  $scope.createStudent=function()
+  {
+	 
+	 if($scope.studentForm.$valid)
+	  {
+		  $scope.status="Creation Success !"
+		  $scope.actionText="OK"
+		$scope.showForm=0;
+		$scope.showModal=1;
+		$http({
+    method : "POST",
+   
+      url : "https://localhost:44371/api/createstudent",
+	  data : {
+		  "Name" : $scope.studentName,
+		  "Email" : $scope.studentEmail,
+		  "Phone" : $scope.studentPhone
+
+	  }
+  }).then(function mySuccess(response) {
+    $scope.createSuccess = response.data;
+	console.log($http);
+	$http({
+    method : "GET",
+   
+      url : "https://localhost:44371/api/getallstudent"
+  }).then(function mySuccess(response) {
+    $scope.myWelcome = response.data;
+	$scope.studentName=$scope.studentPhone=$scope.studentEmail=null;
+  }, function myError(response) {
+    $scope.myWelcome = response.statusText;
+	
+  });
+    
+
+      
+    
+  }, function myError(response) {
+    $scope.createSuccess = response.statusText;
+	console.log($http);
+  });
+
+	  }
+
+	  else{
+		$scope.status="Fill out the form properly"
+		$scope.showModal=1;
+		$scope.showForm=0;
+		$scope.actionText="Go To Form"
+	  }
+
+	  
+
+
+
+  }
+
+  $scope.hide=function(){
+	  $scope.showModal=0;
+		$scope.home();  }
+
+
+  $scope.showCourse=function(name,id){
+					
+					$http({
+			method : "GET",
+		
+			url : "https://localhost:44371/api/studentcourse/"+id
+		}).then(function mySuccess(response) {
+			$scope.showCourse = response.data;
+		}, function myError(response) {
+			$scope.shoeCourse = response.statusText;
+		});
+
+		$scope.showDetails=0;
+		$scope.showStudentCourseDetails=1;
+
+
+		}
+
+  
+
+    $scope.deleteStudent= function(x_id,idx){
+      
+      console.log(x_id);
+	  $scope.showModal=1;
+	  $scope.status="Are you sure?"
+	  $scope.actionText="Confirm"
+	  $scope.action="delete"
+	  $scope.x_id=x_id;
+	  $scope.idx=idx;
+
+    }
+	
+});
+</script>
+
+
+
+ <div ng-app="myShoppingList" id="pricing-table" class="clear " ng-controller="myCtrl" ng-init="showForm=0;showModal=0,showDetails=0">
+   <div class="des">
+   <h1 ng-show="showDetails" style="color: aliceblue; display: block;">Student List</h1>
+   <a ng-show="showDetails"class="signupcust" id={{x.ID}} href="" ng-click="addStudent()" >Add New Student</a> 
+  </div>
+
+   
+  
+  
+  
+  <div ng-show="showDetails" ng-click="showCourse(x.Name,x.ID)"  class="plan" ng-repeat="x in myWelcome">
+      <h3>{{x.Name}}<span>ID:{{x.ID}}</span></h3>
+      <a class="signup" id={{x.ID}} href="" ng-click="deleteStudent(x.ID,$index)">Delete</a>  
+      <a class="signup" id={{x.ID}} href="" ng-click="editStudent(x,$index)"><i class="fas fa-pen"></i></a>        
+      <ul>
+          <li>{{x.Email}}</li>
+          <li>{{x.Phone}}</li>			
+	  </ul> 
+	
+  </div>
+   
+  
+
+  <div ng-show="showStudentCourseDetails" ng-click="showCourse(x.Name,x.ID)"  class="plan" ng-repeat="x in showCourse">
+	<h3>{{x.courseName}}<span></span></h3>
+	<a class="signup" id={{x.ID}} href="" ng-click="deleteStudent(x.ID,$index)">Delete</a>  
+	<a class="signup" id={{x.ID}} href="" ng-click="editStudent(x,$index)"><i class="fas fa-pen"></i></a>        
+</div>
+
+
+
+
+  <div ng-show="showForm" class="login-box">
+	<h2>{{createORedit}}</h2>
+	<form novalidate name="studentForm">
+	  <div class="user-box">
+		<input ng-model="studentName" type="text" name="" ng-required="true">
+		<label>Name</label>
+	  </div>
+	  <div class="user-box">
+		<input ng-model="studentEmail" type="email" name="" ng-required="true">
+		<label>Email</label>
+	  </div>
+	  <div class="user-box">
+		<input ng-model="studentPhone" type="text" name="" ng-required="true">
+		<label>Phone</label>
+	  </div>
+	  <a href="#"  ng-click=createStudent() ng-Show="create" >
+		
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		Submit
+	  </a>
+	  <a href="#"  ng-click=editStudentSuccess() ng-Hide="create" >
+		
+	  <span></span>
+	  <span></span>
+	  <span></span>
+	  <span></span>
+	  Submit
+	</a>
+	<a href="" ng-click="home()">back to home</a>
+
+	</form>
+  </div>
+
+
+  <div ng-show="showModal" ng-click="hide()" class="login-box">
+	<h2>{{status}}</h2>
+	 
+	  <form action="">
+	  <a href="#"  ng-click="showStudent()" >
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+		{{actionText}}
+	  </a>
+	</form>
+	
+  </div>
+
+
+
+
+</div> 
+
+</body>
+</html>
